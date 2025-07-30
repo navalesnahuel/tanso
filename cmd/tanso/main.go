@@ -6,21 +6,19 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/navalesnahuel/tanso/internal/config"
 	"github.com/navalesnahuel/tanso/internal/setup"
 )
 
 func main() {
-	XDG_CONFIG, _ := os.UserConfigDir()
-	XDG_CONFIG = XDG_CONFIG + "/tanso"
-
-	if err := setup.MigrateNvimDefaults(XDG_CONFIG); err != nil {
+	if err := setup.MigrateNvimDefaults(config.XDG_CONFIG); err != nil {
 		log.Fatal(err)
 	}
 
 	cmd := exec.Command("nvim",
-		"-u", XDG_CONFIG+"/init.lua",
-		"--cmd", fmt.Sprintf("set runtimepath^=%v", XDG_CONFIG),
-		XDG_CONFIG,
+		"-u", config.XDG_CONFIG_TANSO+"/init.lua",
+		"--cmd", fmt.Sprintf("set runtimepath^=%v", config.XDG_CONFIG_TANSO),
+		config.XDG_CONFIG_TANSO,
 	)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout

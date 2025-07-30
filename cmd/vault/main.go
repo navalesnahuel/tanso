@@ -1,7 +1,11 @@
 package main
 
-import "github.com/navalesnahuel/tanso/internal/vault"
+import (
+	"github.com/navalesnahuel/tanso/internal/vault"
+)
 
 func main() {
-	vault.FZF()
+	if err := vault.SelectVault(); err != nil {
+		panic(err)
+	}
 }

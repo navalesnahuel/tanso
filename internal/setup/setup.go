@@ -74,11 +74,7 @@ func copyDir(src, dst string) error {
 
 func MigrateNvimDefaults(XDG_CONFIG string) error {
 	slog.Info("Migrating tanso nvim defaults to XDG")
-	XDG_CONFIG, err := os.UserConfigDir()
-	if err != nil {
-		return err
-	}
-	if err = copyDir("./embed/", XDG_CONFIG); err != nil {
+	if err := copyDir("./embed/", XDG_CONFIG); err != nil {
 		return err
 	}
 
