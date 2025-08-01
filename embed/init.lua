@@ -1,7 +1,8 @@
 require("config.lazy")
 require("config.keymaps")
+require("config.highlights")
 require("config.options")
-vim.cmd.colorscheme("tokyonight")
+vim.cmd.colorscheme("rose-pine")
 
 local api = vim.api
 
@@ -79,6 +80,11 @@ api.nvim_create_autocmd({
 vim.api.nvim_create_autocmd("ModeChanged", {
 	pattern = "*",
 	callback = function()
+		-- salteá si estás en un buffer de oil
+		if vim.bo.filetype == "oil" then
+			return
+		end
+
 		local mode = vim.fn.mode()
 		if mode == "n" then
 			vim.opt.conceallevel = 2

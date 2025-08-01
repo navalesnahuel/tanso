@@ -8,10 +8,34 @@ import (
 	"strings"
 )
 
-var (
+type Config struct {
 	XDG_CONFIG            string
 	XDG_CONFIG_TANSO      string
 	XDG_CONFIG_TANSO_FILE string
+
+	VAULT_FOLDER string
+	COLORSCHEME  string
+	LENGUAGE     string
+	ZEN          bool
+
+	// bindings
+	PREFIX                string
+	SHOW_DEFINITION       string
+	NOTE_FINDER           string
+	VAULT_FINDER          string
+	FILE_BROWSER          string
+	NAVEGATE_THROUGH_TABS string
+	BACKLINK_REF          string
+	GREP                  string
+	CMP_SELECT_NEXT       string
+	CMP_SELECT_PREV       string
+	CMD_CONFIRM           string
+	CMP_COMPLETE          string
+	SEARCH_SAME_WORD      string
+}
+
+var (
+	Cfg = new(Config)
 )
 
 func init() {
@@ -20,14 +44,20 @@ func init() {
 		log.Fatal("Could not get the home dir for the user", err)
 	}
 
-	XDG_CONFIG = homeDir
-	XDG_CONFIG_TANSO = XDG_CONFIG + "/tanso"
-	XDG_CONFIG_TANSO_FILE = XDG_CONFIG_TANSO + "/config.yaml"
+	// XDG_CONFIG
+	Cfg.XDG_CONFIG = homeDir
+	Cfg.XDG_CONFIG_TANSO = Cfg.XDG_CONFIG + "/tanso"
+	Cfg.XDG_CONFIG_TANSO_FILE = Cfg.XDG_CONFIG_TANSO + "/config.yaml"
+
+	// CUSTOMIZATION
+	Cfg.VAULT_FOLDER, _ = GetConfig("vault")
+
+	// KEY-BINDINGS
 
 }
 
 func GetConfig(key string) (string, error) {
-	data, err := os.OpenFile(XDG_CONFIG_TANSO_FILE, os.O_RDONLY, 0777)
+	data, err := os.OpenFile(Cfg.XDG_CONFIG_TANSO_FILE, os.O_RDONLY, 0777)
 	if err != nil {
 		return "", fmt.Errorf("Error trying to parse the config file, error: %w", err)
 	}
@@ -57,7 +87,7 @@ func GetConfig(key string) (string, error) {
 }
 
 func SetConfig(key, value string) error {
-	data, err := os.ReadFile(XDG_CONFIG_TANSO_FILE)
+	data, err := os.ReadFile(Cfg.XDG_CONFIG_TANSO_FILE)
 	if err != nil {
 		return fmt.Errorf("Error trying to open the config file, error: %w", err)
 	}
@@ -87,13 +117,13 @@ func SetConfig(key, value string) error {
 
 	if !found {
 		newContent := fmt.Sprintf("%s\n%s=%s", string(data), key, value)
-		err := os.WriteFile(XDG_CONFIG_TANSO_FILE, []byte(newContent), 0644)
+		err := os.WriteFile(Cfg.XDG_CONFIG_TANSO_FILE, []byte(newContent), 0644)
 		if err != nil {
 			return fmt.Errorf("Error writting config file: %w", err)
 		}
 	} else {
 		newContent := strings.Join(lines, "\n")
-		err := os.WriteFile(XDG_CONFIG_TANSO_FILE, []byte(newContent), 0644)
+		err := os.WriteFile(Cfg.XDG_CONFIG_TANSO_FILE, []byte(newContent), 0644)
 		if err != nil {
 			return fmt.Errorf("Error writting config file: %w", err)
 		}

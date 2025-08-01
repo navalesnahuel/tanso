@@ -3,7 +3,6 @@ package vault
 import (
 	"bytes"
 	"fmt"
-	"log/slog"
 	"os"
 	"os/exec"
 	"strings"
@@ -21,11 +20,11 @@ func searchFolderFZF() string {
 	err := cmd.Run()
 	if err != nil {
 		if exitErr, ok := err.(*exec.ExitError); ok && exitErr.ExitCode() == 130 {
-			slog.Info("fzf search of the vault was canceled by the user")
+			fmt.Printf("fzf search of the vault was canceled by the user\n")
 			os.Exit(0)
 			return ""
 		}
-		slog.Error("Error while trying to set the new vault, please run 'tanso vault' again to try", "error", err)
+		fmt.Printf("error while trying to set the new vault, please run 'tanso vault' again to try")
 		return ""
 	}
 
@@ -36,10 +35,10 @@ func searchFolderFZF() string {
 func SelectVault() error {
 	vault := searchFolderFZF()
 	if vault == "" {
-		return fmt.Errorf("Error: Something went wrong while selecting the vault, please run 'tanso vault' again")
+		return fmt.Errorf("something went wrong while selecting the vault, please run 'tanso vault' again")
 	}
 	if err := config.SetConfig("vault", vault); err != nil {
-		return fmt.Errorf("Error: Something went wrong trying to set the new vault on the config: %w", err)
+		return fmt.Errorf("something went wrong trying to set the new vault on the config: %w", err)
 	}
 	return nil
 
