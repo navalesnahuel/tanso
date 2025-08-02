@@ -20,19 +20,27 @@ func Run(execDir string) {
 		log.Fatal(err)
 	}
 
+	env := os.Environ()
+
 	args := []string{
-		"-u", cfg.XDG_CONFIG_TANSO + "/init.lua",
+		"-u", filepath.Join(cfg.XDG_CONFIG_TANSO, "init.lua"),
 		"--cmd", fmt.Sprintf("set runtimepath^=%s", cfg.XDG_CONFIG_TANSO),
-		execDir,
+	}
+
+	if execDir != "" {
+		args = append(args, execDir)
 	}
 
 	command := exec.Command("nvim", args...)
 	command.Dir = cfg.VAULT_FOLDER
-
+	command.Env = env
 	command.Stdin = os.Stdin
 	command.Stdout = os.Stdout
 	command.Stderr = os.Stderr
-	command.Run()
+
+	if err := command.Run(); err != nil {
+		log.Fatalf("failed to launch Neovim: %v", err)
+	}
 }
 
 func NewNote(fileName string) error {

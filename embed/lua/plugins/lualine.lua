@@ -8,15 +8,16 @@ return {
 
 		local custom_theme = function()
 			local colors = {
-				fg = "#c0c0c0", -- más claro
-				yellow = "#f1c04a", -- más vibrante
-				cyan = "#8bd5e0", -- más claro y saturado
-				green = "#b6e07d", -- más brillante
-				orange = "#f78c4b", -- más contrastado
-				violet = "#df77c6", -- más saturado y brillante
-				magenta = "#e84a5f", -- rojo magenta más fuerte
-				blue = "#85d3f2", -- azul cielo más saturado
-				red = "#f85c50", -- rojo más llamativo
+				fg = "#c0c0c0",
+				bg = "#1a1a1a",
+				yellow = "#f1c04a",
+				cyan = "#8bd5e0",
+				green = "#b6e07d",
+				orange = "#f78c4b",
+				violet = "#df77c6",
+				magenta = "#e84a5f",
+				blue = "#85d3f2",
+				red = "#f85c50",
 			}
 
 			return {
@@ -53,6 +54,16 @@ return {
 			}
 		end
 
+		-- Custom component for markdown word count
+		local function word_count()
+			if vim.bo.filetype == "markdown" then
+				local words = vim.fn.wordcount().words
+				return "" .. words .. " words"
+			end
+			return ""
+		end
+
+		-- Custom component for markdown links count
 		require("lualine").setup({
 			options = {
 				icons_enabled = true,
@@ -74,37 +85,46 @@ return {
 				lualine_a = { { "mode", padding = { left = 1, right = 0 } } },
 				lualine_b = {
 					{
-						-- "filename",
-						-- path = 0,
-						-- shorting_target = 40,
-						-- symbols = {
-						-- 	modified = "[+]",
-						-- 	readonly = "[-]",
-						-- 	unnamed = "No Name",
-						-- 	newfile = "New",
-						-- 	padding = { left = 1, right = 1 },
-						-- },
+						"filename",
+						path = 1,
+						symbols = {
+							modified = "[+]",
+							readonly = "[-]",
+							unnamed = "",
+							newfile = "",
+						},
+						padding = { left = 1, right = 1 },
 					},
 				},
-
+				lualine_c = {},
 				lualine_x = {
-					-- { "branch", icon = "", padding = { left = 1, right = 1 } },
-					-- {
-					-- 	"diff",
-					-- 	symbols = { added = "+", modified = "~", removed = "-" },
-					-- 	padding = { left = 1, right = 1 },
-					-- },
-				},
-				lualine_c = {
-					-- { "diagnostics", padding = { left = 1, right = 1 } }
+					{ word_count, padding = { left = 0, right = 0 } },
+
+					{
+						"location",
+						padding = { left = 1, right = 0 },
+					},
 				},
 				lualine_y = {
-					-- { "filetype", padding = 0 }
+					{
+						"progress",
+						padding = { left = 1, right = 1 },
+					},
 				},
-				lualine_z = {},
+				lualine_z = {
+					{
+						"encoding",
+						padding = { left = 1, right = 0 },
+					},
+				},
 			},
 			inactive_sections = {
+				lualine_a = {},
+				lualine_b = {},
 				lualine_c = { "filename" },
+				lualine_x = { "location" },
+				lualine_y = {},
+				lualine_z = {},
 			},
 			tabline = {},
 			winbar = {},

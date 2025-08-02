@@ -1,104 +1,90 @@
 return {
 	{
 		"neovim/nvim-lspconfig",
-		event = { "BufReadPre", "BufNewFile" },
 		dependencies = {
-			{ "williamboman/mason.nvim" },
-			{ "williamboman/mason-lspconfig.nvim" },
-			{ "hrsh7th/nvim-cmp" },
-			{ "hrsh7th/cmp-nvim-lsp" },
-			{ "hrsh7th/cmp-buffer" },
-			{ "hrsh7th/cmp-path" },
+			"williamboman/mason.nvim",
+			"williamboman/mason-lspconfig.nvim",
+			"hrsh7th/cmp-nvim-lsp",
+			"hrsh7th/cmp-buffer",
+			"hrsh7th/cmp-path",
+			"hrsh7th/cmp-cmdline",
+			"hrsh7th/nvim-cmp",
+			"L3MON4D3/LuaSnip",
+			"saadparwaiz1/cmp_luasnip",
+			"rafamadriz/friendly-snippets",
 		},
 		config = function()
-			vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end
-
-			vim.diagnostic.config({
-				virtual_text = false,
-				signs = false,
-				underline = false,
-				update_in_insert = false,
+			-- Setup Mason
+			require("mason").setup()
+			require("mason-lspconfig").setup({
+				ensure_installed = {
+					"lua_ls",
+					"marksman", -- Markdown LSP
+				},
 			})
-			-- ================================
 
-			local on_attach = function(client, bufnr)
-				local opts = { buffer = bufnr, noremap = true, silent = true }
-				vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-				vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-				vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-				vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-				vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+			-- Setup nvim-cmp
+			local cmp = require("cmp")
+			local luasnip = require("luasnip")
 
-				if client.name == "ltex" then
-					local function set_language(language_id)
-						vim.lsp.buf.execute_command({
-							command = "ltex.setDocumentLanguage",
-							arguments = { uri = vim.uri_from_bufnr(bufnr), languageId = language_id },
-							bufnr = bufnr,
-						})
-						vim.notify("LTeX language set to: " .. language_id, vim.log.levels.INFO)
-					end
+			-- Load friendly-snippets
+			require("luasnip.loaders.from_vscode").lazy_load()
 
-					vim.keymap.set("n", "<leader>setes", function()
-						set_language("es-ES")
-					end, { buffer = bufnr, desc = "LTeX: Set language to Spanish" })
-					vim.keymap.set("n", "<leader>seten", function()
-						set_language("en-US")
-					end, { buffer = bufnr, desc = "LTeX: Set language to English" })
-				end
-			end
+			cmp.setup({
+				snippet = {
+					expand = function(args)
+						luasnip.lsp_expand(args.body)
+					end,
+				},
+				mapping = {
+					["<C-p>"] = cmp.mapping.select_prev_item(),
+					["<C-n>"] = cmp.mapping.select_next_item(),
+					["<C-d>"] = cmp.mapping.scroll_docs(-4),
+					["<C-f>"] = cmp.mapping.scroll_docs(4),
+					["<C-Space>"] = cmp.mapping.complete(),
+					["<C-e>"] = cmp.mapping.close(),
+					["<C-y>"] = cmp.mapping.confirm({
+						behavior = cmp.ConfirmBehavior.Replace,
+						select = true,
+					}),
+				},
+				sources = {
+					{ name = "nvim_lsp" },
+					{ name = "luasnip" },
+					{ name = "buffer" },
+					{ name = "path" },
+				},
+			})
 
+			-- Setup LSP
+			local lspconfig = require("lspconfig")
 			local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
-			require("mason").setup()
-			local mason_lspconfig = require("mason-lspconfig")
-
-			local servers = {
-				"ltex",
-			}
-
-			mason_lspconfig.setup({
-				ensure_installed = servers,
+			-- Lua LSP
+			lspconfig.lua_ls.setup({
+				capabilities = capabilities,
+				settings = {
+					Lua = {
+						diagnostics = {
+							globals = { "vim" },
+						},
+					},
+				},
 			})
 
-			local lspconfig = require("lspconfig")
-			for _, server in ipairs(servers) do
-				if server == "ltex" then
-					lspconfig.ltex.setup({
-						capabilities = capabilities,
-						on_attach = on_attach,
-						settings = {
-							ltex = {
-								language = "en-US",
-								dictionary = {
-									["en-US"] = {},
-									["es-ES"] = {},
-								},
-							},
-						},
-					})
-				else
-					lspconfig[server].setup({
-						capabilities = capabilities,
-						on_attach = on_attach,
-					})
-				end
-			end
+			-- Markdown LSP (Marksman)
+			lspconfig.marksman.setup({
+				capabilities = capabilities,
+				filetypes = { "markdown" },
+			})
 
-			local cmp = require("cmp")
-			cmp.setup({
-				mapping = cmp.mapping.preset.insert({
-					["<Tab>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
-					["<S-Tab>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
-					["<CR>"] = cmp.mapping.confirm({ select = true }),
-					["<C-Space>"] = cmp.mapping.complete(),
-				}),
-				sources = cmp.config.sources({
-					{ name = "nvim_lsp" },
-					{ name = "path" },
-				}, {
-					{ name = "buffer" },
-				}),
+			-- Global mappings for LSP
+			vim.api.nvim_create_autocmd("LspAttach", {
+				group = vim.api.nvim_create_augroup("UserLspConfig", {}),
+				callback = function(ev)
+					local opts = { buffer = ev.buf }
+					vim.keymap.set("n", "gd", vim.lsp.buf.hover, opts)
+				end,
 			})
 		end,
 	},

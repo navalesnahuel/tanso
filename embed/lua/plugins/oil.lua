@@ -53,18 +53,6 @@ return {
 			use_default_keymaps = false,
 			view_options = {
 				show_hidden = false,
-				is_hidden_file = function(name, bufnr)
-					return name:match("^%.") ~= nil
-				end,
-				is_always_hidden = function(name, bufnr)
-					return name == "__pycache__" or name:match("%.pyc$")
-				end,
-				natural_order = "fast",
-				case_insensitive = false,
-				sort = {
-					{ "type", "asc" },
-					{ "name", "asc" },
-				},
 				highlight_filename = function(entry, is_hidden, is_link_target, is_link_orphan)
 					local hl_group = nil
 					local ok, stat = pcall(vim.uv.fs_stat, entry.path)

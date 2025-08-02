@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"log/slog"
 	"os"
 	"path/filepath"
 )
@@ -73,11 +72,12 @@ func copyDir(src, dst string) error {
 }
 
 func MigrateNvimDefaults(XDG_CONFIG string) error {
-	slog.Info("Migrating tanso nvim defaults to XDG")
-	if err := copyDir("./embed/", XDG_CONFIG); err != nil {
-		return err
+	_, err := os.Stat(XDG_CONFIG + "/init.lua")
+	if err != nil {
+		if err := copyDir("./embed/", XDG_CONFIG); err != nil {
+			return err
+		}
 	}
 
-	slog.Info("embed tanso nvim configuration migrated to XDG Directory")
 	return nil
 }

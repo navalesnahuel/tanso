@@ -12,6 +12,7 @@ type Config struct {
 	XDG_CONFIG            string
 	XDG_CONFIG_TANSO      string
 	XDG_CONFIG_TANSO_FILE string
+	HOME_DIR              string
 
 	VAULT_FOLDER string
 	COLORSCHEME  string
@@ -46,8 +47,10 @@ func init() {
 
 	// XDG_CONFIG
 	Cfg.XDG_CONFIG = homeDir
+	Cfg.HOME_DIR = homeDir
+
 	Cfg.XDG_CONFIG_TANSO = Cfg.XDG_CONFIG + "/tanso"
-	Cfg.XDG_CONFIG_TANSO_FILE = Cfg.XDG_CONFIG_TANSO + "/config.yaml"
+	Cfg.XDG_CONFIG_TANSO_FILE = Cfg.XDG_CONFIG_TANSO + "/cfg"
 
 	// CUSTOMIZATION
 	Cfg.VAULT_FOLDER, _ = GetConfig("vault")
