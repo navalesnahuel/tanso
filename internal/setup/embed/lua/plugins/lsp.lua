@@ -23,11 +23,9 @@ return {
 				},
 			})
 
-			-- Setup nvim-cmp
 			local cmp = require("cmp")
 			local luasnip = require("luasnip")
 
-			-- Load friendly-snippets
 			require("luasnip.loaders.from_vscode").lazy_load()
 
 			cmp.setup({
@@ -51,8 +49,6 @@ return {
 				sources = {
 					{ name = "nvim_lsp" },
 					{ name = "luasnip" },
-					{ name = "buffer" },
-					{ name = "path" },
 				},
 			})
 
@@ -60,31 +56,10 @@ return {
 			local lspconfig = require("lspconfig")
 			local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
-			-- Lua LSP
-			lspconfig.lua_ls.setup({
-				capabilities = capabilities,
-				settings = {
-					Lua = {
-						diagnostics = {
-							globals = { "vim" },
-						},
-					},
-				},
-			})
-
 			-- Markdown LSP (Marksman)
 			lspconfig.marksman.setup({
 				capabilities = capabilities,
 				filetypes = { "markdown" },
-			})
-
-			-- Global mappings for LSP
-			vim.api.nvim_create_autocmd("LspAttach", {
-				group = vim.api.nvim_create_augroup("UserLspConfig", {}),
-				callback = function(ev)
-					local opts = { buffer = ev.buf }
-					vim.keymap.set("n", "gd", vim.lsp.buf.hover, opts)
-				end,
 			})
 		end,
 	},

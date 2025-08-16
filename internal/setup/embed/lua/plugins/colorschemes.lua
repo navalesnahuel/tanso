@@ -18,7 +18,13 @@ return {
 
 				styles = {
 					italic = false,
-					transparency = true,
+					transparency = false,
+				},
+
+				palette = {
+					moon = {
+						base = "#161616",
+					},
 				},
 			})
 		end,

@@ -22,7 +22,7 @@ opt.clipboard = "unnamedplus"
 
 -- Formatting
 opt.formatoptions:remove("o")
-opt.guicursor = ""
+-- opt.guicursor = ""  -- Commented out to fix cursor tiling in Ghostty
 opt.wrap = true
 opt.linebreak = true
 opt.showbreak = "↪ "
@@ -68,6 +68,9 @@ opt.ruler = false
 opt.laststatus = 3
 opt.cmdheight = 0
 opt.showtabline = 0
+
+-- Terminal compatibility (especially for Ghostty)
+opt.termguicolors = true
 
 -- Wild menu
 opt.wildmenu = true

@@ -1,6 +1,5 @@
 -- Load Tanso configuration
 require("config.lazy")
-require("config.keymaps")
 require("config.highlights")
 require("config.options")
 
